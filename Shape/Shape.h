@@ -3,7 +3,9 @@
 #define __MYSHAPE__
 
 #include <iostream>
+#include <ctime>
 
+const float PI = 3.14f;
 using namespace std;
 
 //Make a enum of shape types
@@ -11,6 +13,11 @@ enum shapeType
 {
 	RECT,CIRC
 };
+
+int GenerateRand() 
+{
+	return rand() % 10 + 1;
+}
 
 //base class
 class Shape
@@ -33,6 +40,7 @@ protected:
 public:
 
 	virtual int GetArea() = 0;
+	virtual void AddNo(int _no) { no += _no; };
 	virtual void SetNo(int _no) { no = _no; };
 	virtual int GetNo() { return no; };
 	virtual void Draw() {};
@@ -69,19 +77,16 @@ private:
 	static int _count;
 
 protected:
-	Rectangle(int dummy) :Shape()
-	{
-		Shape::SetNo(_count++);
-	}
-
+	Rectangle(int dummy);
+	
 public:
 	int GetWidth();
 	int GetHeight();
 	virtual void Draw();
-	Rectangle(int no,int x,int y,int width,int height);
-	Rectangle(int no,const Point& leftUp,int width,int height);
+	virtual int GetArea();
+	Rectangle(int x,int y,int width,int height);
+	Rectangle(const Point& leftUp,int width,int height);
 	Rectangle(const Rectangle& other);
-	Rectangle(int dummy);
 	Rectangle& operator = (const Rectangle& other);
 	~Rectangle();
 	shapeType returnType();
@@ -95,17 +100,34 @@ int Rectangle::_count = 1;
 //class Circle derives from class Shape
 class Circle : public Shape
 {
+private:
+
 	Point* center;
 	int radius;
+	static Circle _circle;
+	static int _count;
+	Circle();
+	
+protected:
+
+	Circle(int dummy);
+
 public:
+
 	int GetRadius();
 	virtual void Draw();
-	Circle(int no,int x, int y, int radius);
-	Circle(const Point& center,int no, int radius);
+	virtual int GetArea();
+	shapeType returnType();
+	Shape* clone();
+	Circle(int x, int y, int radius);
+	Circle(const Point& center, int radius);
 	Circle(const Circle& other);
 	Circle& operator = (const Circle& other);
 	~Circle();
 };
+
+Circle Circle::_circle;
+int Circle::_count = 1;
 
 inline Shape * Shape::findAndClone(shapeType type)
 {
@@ -122,6 +144,7 @@ inline Shape * Shape::findAndClone(shapeType type)
 inline Shape::Shape()
 {
 	//TODO:Shape constructor...
+	no = 0;
 }
 
 //Point constructor overload
@@ -168,7 +191,12 @@ inline int Rectangle::GetHeight()
 
 inline void Rectangle::Draw()
 {
-	cout << "No:" << Shape::GetNo() << "    " << "X:" << leftUp->GetX() << "    " << "Y:" << leftUp->GetY() << "    " << "Width:" << GetWidth() << "    " << "Height:" << GetHeight() << endl;
+	cout << "No:" << Shape::GetNo() << "    " << "X:" << (leftUp->GetX()) << "    " << "Y:" << (leftUp->GetY()) << "    " << "Width:" << GetWidth() << "    " << "Height:" << GetHeight() << endl;
+}
+
+inline int Rectangle::GetArea() 
+{
+	return width*height;
 }
 
 //Method to return width value
@@ -184,22 +212,22 @@ inline Rectangle::Rectangle() :Shape()
 }
 
 //Rectangle constructor overload
-inline Rectangle::Rectangle(int no,int x = 0,int y = 0, int width = 1, int height = 1):Shape(),width(width),height(height)
+inline Rectangle::Rectangle(int x,int y, int width = 1, int height = 1):Shape(),width(width),height(height)
 {
-	if (leftUp==nullptr)
-	{
+	/*if (leftUp==nullptr)
+	{*/
 		leftUp = new Point(x, y);
-	}
-	else
-	{
-		delete leftUp;
-		leftUp = nullptr;
-		leftUp = new Point(x, y);
-	}
+	//}
+	//else
+	//{
+	//	delete leftUp;
+	//	leftUp = nullptr;
+	//	leftUp = new Point(x, y);
+	//}
 }
 
 //Rectangle constructor overload
-inline Rectangle::Rectangle(int no,const Point& otherLeftUp, int width, int height):Shape(),width(width),height(height)
+inline Rectangle::Rectangle(const Point& otherLeftUp, int width, int height):Shape(),width(width),height(height)
 {
 	if (leftUp==nullptr)
 	{
@@ -226,9 +254,13 @@ inline Rectangle::Rectangle(const Rectangle& other):Shape(other),width(other.wid
 	}
 }
 
+//This constructor is used to clone from prototype
 inline Rectangle::Rectangle(int dummy):Shape()
 {
-	Shape::SetNo(_count++);
+	Shape::AddNo(_count++);
+	leftUp = new Point(GenerateRand(), GenerateRand());
+	width = GenerateRand();
+	height = GenerateRand();
 }
 
 //Rectangle assignment copy operator overload
@@ -275,28 +307,34 @@ inline shapeType Rectangle::returnType()
 	return RECT;
 }
 
-inline Shape * Rectangle::clone()
+inline Shape* Rectangle::clone()
 {
 	return new Rectangle(1);
 }
 
-//Circle constructor overload
-inline Circle::Circle(int no,int x, int y, int radius):Shape(),radius(radius)
+//This constructor is used to be registered in prototype
+inline Circle::Circle() :Shape()
 {
-	if(center==nullptr)
-	{
-		center = new Point(x, y);
-	}
-	else
-	{
-		delete center;
-		center = nullptr;
-		center = new Point(x, y);
-	}
+	addPrototype(this);
 }
 
 //Circle constructor overload
-inline Circle::Circle(const Point& center, int no, int radius):Shape(),radius(radius)
+inline Circle::Circle(int x, int y, int radius):Shape(),radius(radius)
+{
+	//if(center==nullptr)
+	//{
+		center = new Point(x, y);
+	//}
+	//else
+	//{
+	//	delete center;
+	//	center = nullptr;
+	//	center = new Point(x, y);
+	//}
+}
+
+//Circle constructor overload
+inline Circle::Circle(const Point& center, int radius):Shape(),radius(radius)
 {
 	if(this->center==nullptr)
 	{
@@ -361,6 +399,13 @@ inline Circle::~Circle()
 	center = nullptr;
 }
 
+inline Circle::Circle(int dummy):Shape()
+{
+	Shape::AddNo(_count++);
+	center = new Point(GenerateRand(), GenerateRand());
+	radius = GenerateRand();
+}
+
 //Method to return radius value
 inline int Circle::GetRadius()
 {
@@ -369,7 +414,22 @@ inline int Circle::GetRadius()
 
 inline void Circle::Draw()
 {
-	cout << "No:" << Shape::GetNo() << "    " << "X:" << center->GetX() << "    " << "Y:" << center->GetY() << "    " << "Radius:" << GetRadius() << endl;
+	cout << "No:" << Shape::GetNo() << "    " << "X:" << (center->GetX()) << "    " << "Y:" << (center->GetY()) << "    " << "Radius:" << GetRadius() << endl;
+}
+
+inline int Circle::GetArea()
+{
+	return (int)(PI * radius * radius);
+}
+
+inline shapeType Circle::returnType()
+{
+	return CIRC;
+}
+
+inline Shape * Circle::clone()
+{
+	return new Circle(1);
 }
 
 #endif
