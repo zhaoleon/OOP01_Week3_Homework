@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <ctime>
+#include <algorithm>
 
 const float PI = 3.14f;
 using namespace std;
@@ -191,7 +192,7 @@ inline int Rectangle::GetHeight()
 
 inline void Rectangle::Draw()
 {
-	cout << "No:" << Shape::GetNo() << "    " << "X:" << (leftUp->GetX()) << "    " << "Y:" << (leftUp->GetY()) << "    " << "Width:" << GetWidth() << "    " << "Height:" << GetHeight() << endl;
+	cout << "No:" << Shape::GetNo() << "    " << "X:" << (leftUp->GetX()) << "    " << "Y:" << (leftUp->GetY()) << "    " << "Width:" << GetWidth() << "    " << "Height:" << GetHeight() << "    " << "Area:" << GetArea() << endl;
 }
 
 inline int Rectangle::GetArea() 
@@ -414,7 +415,7 @@ inline int Circle::GetRadius()
 
 inline void Circle::Draw()
 {
-	cout << "No:" << Shape::GetNo() << "    " << "X:" << (center->GetX()) << "    " << "Y:" << (center->GetY()) << "    " << "Radius:" << GetRadius() << endl;
+	cout << "No:" << Shape::GetNo() << "    " << "X:" << (center->GetX()) << "    " << "Y:" << (center->GetY()) << "    " << "Radius:" << GetRadius() << "    " << "Area:" << GetArea() <<endl;
 }
 
 inline int Circle::GetArea()
