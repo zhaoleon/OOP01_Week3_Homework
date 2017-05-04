@@ -3,52 +3,79 @@
 
 #include "Shape.h"
 
-const int NUM_IMAGE = 20;
-shapeType input[NUM_IMAGE]{ RECT,RECT,RECT,RECT,RECT,RECT,RECT,RECT,RECT,RECT,CIRC,CIRC,CIRC,CIRC,CIRC,CIRC,CIRC,CIRC,CIRC,CIRC };
-
-bool isGood(int i)
-{
-	return i < 50;
-}
+const int NUM_SHAPE = 20;
+shapeType input[NUM_SHAPE]{ RECT,RECT,RECT,RECT,RECT,RECT,RECT,RECT,RECT,RECT,CIRC,CIRC,CIRC,CIRC,CIRC,CIRC,CIRC,CIRC,CIRC,CIRC };
 
 int main()
 {
+	//Generate random seed
 	srand((unsigned)time(nullptr));
-	Shape* shape[NUM_IMAGE];
+	//Define shape array
+	Shape* shape[NUM_SHAPE];
 	
-	for (int i = 0; i < NUM_IMAGE; i++)
+	//Generate shape object and push it into shape array by using prototype pattern
+	for (int i = 0; i < NUM_SHAPE; i++)
 	{
 		shape[i] = Shape::findAndClone(input[i]);
 		shape[i]->SetNo(i+1);
 	}
 
-	for (int i = 0; i < NUM_IMAGE; i++)
+	//Print the objects on the screen
+	for (int i = 0; i < NUM_SHAPE; i++)
 	{
 		shape[i]->Draw();
 	}
 	
-	//for (int i = 0; i < NUM_IMAGE; i++)
-	//{
-	//	int n = NUM_IMAGE;
-	//	if (shape[i]->GetArea() < 50)
-	//	{
-	//		for (int j = i; j < n - 1; j++)
-	//		{
-	//			*(shape[j]) = *(shape[j + 1]);
-	//		}
-	//		n--;
-	//	}
-	//}
-	
-	Shape* pEnd = remove_if(begin(shape), end(shape), isGood);
+	//Marking
+	cout << "--------------------------------------------------------------------------" << endl;
+	cout << "|                     New Array Through The Filter                       |" << endl;
+	cout << "--------------------------------------------------------------------------" << endl;
 
-	for (int i = 0; i < NUM_IMAGE; i++)
-	{
-		pEnd->Draw();
+	//Filter the objects which its area is bigger than 50 and push it into a new array then delete the rest of the array member
+	int index = 0;
+	int n = NUM_SHAPE;
+	while (index < n)
+	{			
+		if (shape[index]->GetArea() < 50)
+		{
+
+			for (int i = index;i < n -1; ++i)
+			{
+				shape[i] = shape[i + 1];
+			}
+			--n;
+		}
+		else
+		{
+			index++;
+		}
 	}
 
-	for (int i = 0; i < NUM_IMAGE; i++)
+	//New array
+	Shape** newArr = new Shape*[n];
+
+
+	//Print the new array on the screen,delete the useless member and release its memory
+	for (int i=0;i<n;i++)
+	{
+		newArr[i] = shape[i];
+		newArr[i]->Draw();
 		delete shape[i];
+		shape[i] = nullptr;
+	}
+
+	//Reset the rest members to default nullptr
+	for (int i = NUM_SHAPE-1; i >n-1; --i) 
+	{
+		shape[i] = nullptr;
+	}
+
+
+	//Free the memory that is used by new array
+	delete newArr;
+	newArr = nullptr;
+
+	//shape = nullptr;
 
 	system("pause");
     return 0;

@@ -4,7 +4,6 @@
 
 #include <iostream>
 #include <ctime>
-#include <algorithm>
 
 const float PI = 3.14f;
 using namespace std;
